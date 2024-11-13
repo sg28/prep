@@ -1,0 +1,415 @@
+Tree
+
+/*
+Given an integer n, return all the structurally unique BST's (binary search trees), which has exactly n nodes of unique values from 1 to n. Return the answer in any order.
+*/
+
+function uniqueBinaryTree(n){
+
+	let start = 1, end = n;
+	let res = [];
+
+	function helper(start, end){
+
+		let leftTree = helper(start, i-1);
+		let rightTree = helper(i+1, end);
+
+		for(let l of leftTree){
+			for(let r of rightTree){
+				let root = new TreeNode(i);
+				root.left = l;
+				root.right = r;
+				root.push(root);
+			}
+		}
+	}
+	helper()
+	return res;
+	
+}
+uniqueBinaryTree(n)
+
+/*
+Given an integer n, return the number of structurally unique BST's (binary search trees) which has exactly n nodes of unique values from 1 to n.
+
+Use the above approach and return res.length.
+But that is a brute force approach.
+
+*/
+
+/* Given the root of a binary tree, determine if it is a valid binary search tree (BST).
+*/
+
+let checkValidBST = (node, min=-Infinity, max=Infinity) => {
+	if(!node) return true;
+
+	if(node.value <= min || node.value => max) return false;
+
+	let leftTree  = checkValidBST(node.left, min, node.value);
+	let rightTree = checkValidBST(node.right, node.value, max);
+
+	return leftTree && rightTree;
+
+}
+checkValidBST(root);
+
+
+/*  Recover Binary Tree.
+You are given the root of a binary search tree (BST), where the values of exactly two nodes of the tree were swapped by mistake. Recover the tree without changing its structure.
+*/
+
+// InOrder traversal
+
+let recoverBinaryTree =(node)=>{
+	let x = null; 
+	let y = null; 
+	let prev = null; 
+
+	function helper(node){
+		if(!node) return;
+		helper(node.left)
+		
+		// Checks to maintain the ascending order. As in valid BST the values should appear in ascending order.
+		if(prev && prev.value > node.value){
+			// Check for the first node.
+			if(!x) x = node;
+			y = node;
+		}
+		
+		prev = node;
+		helper(node.right)
+	};
+	helper(root)
+	[x.value, y.value] = [y.value, x.value];
+	
+}
+recoverBinaryTree(root)
+
+/*
+	Given the roots of two binary trees p and q, write a function to check if they are the same or not.
+
+	Two binary trees are considered the same if they are structurally identical, and the nodes have the same value.
+*/
+
+let checkSameTree =(node1, node2)=>{
+	if(!node1 && !node2) return true;
+	if(!node1 || !node2) return false;
+	if(!node1.value || !node2.value) return false;
+
+	let leftTree = checkSameTree(node1.left, node1.right);
+	let rightTree = checkSameTree(node2.left, node2.right);
+
+}
+checkSameTree(root1, root2)
+
+/*
+	Given the root of a binary tree, check whether it is a mirror of itself (i.e., symmetric around its center).
+*/
+
+var isSymmetric = function(root) {
+if (!root) return true;
+
+	function helper(node1, node2) {
+	    if (!node1 && !node2) return true;
+	    if (!node1 || !node2) return false;
+	    if (node1.val !== node2.val) return false;
+
+	    let leftTree = helper(node1.left, node2.right);
+	    let rightTree = helper(node1.right, node2.left);
+
+	    return leftTree && rightTree;
+	}
+	return helper(root.left, root.right);
+};
+
+
+/*
+	Given the root of a binary tree, return the level order traversal of its nodes' values. (i.e., from left to right, level by level).
+*/
+
+
+let levelOrderTraversal =(node)=>{
+	let res = [];
+	let level = 0;
+
+	function helper(node, level){
+
+		if(!node) return;
+
+		// if no sub array is created the res array length will be equal to the level. We push an empty list.
+		if(res.length === level){
+			res.push([]);
+		}
+
+		res[level].push(node.value);
+		helper(node.left, level + 1)
+		helper(node.right, level + 1)
+	}
+	helper(node)
+}
+levelOrderTraversal(root)
+
+
+/*
+Given the root of a binary tree, return the zigzag level order traversal of its nodes' values. (i.e., from left to right, then right to left for the next level and alternate between).
+
+*/
+
+let zigzagLevelOrder =(node)=>{
+     let res = [];
+     let level = 0;
+
+     function helper(node, level){
+        if(!node) return;
+
+        if(res.length === level) res.push([]);
+
+        // even
+        if(level % 2 === 0){
+            res[level].push(node.value)
+        }
+        //odd
+        if(level % 2 !== 0){
+            res[level].unshift(node.value)
+        }
+
+        helper(node.left, level+1)
+        helper(node.right, level+1)
+     }
+     helper(node, level)   
+}
+zigzagLevelOrder(root)
+
+
+
+/*
+Given the root of a binary tree, return its maximum depth.
+A binary tree's maximum depth is the number of nodes along the longest path from the root node down to the farthest leaf node.
+
+*/
+let maxDepth =(root)=>{
+    let res = [];
+    let level = 0;
+    let maxDepth = 0;
+    if(!root || root.length === 0) return 0;
+    function helper(node, level){
+        if(!node) return;
+
+        if(res.length === level) res[level] = [];
+        if(level > maxDepth) maxDepth = level;
+
+        res[level].push(node.val)
+        helper(node.left, level+1)
+        helper(node.right, level+1)
+    }
+    helper(root, level)
+    return maxDepth + 1;
+}
+// In this solution we get all the nodes in level order
+and we also get the depth of the Binary Tree.
+
+
+/*
+Given two integer arrays preorder and inorder where preorder is the preorder traversal of a binary tree and inorder is the inorder traversal of the same tree, construct and return the binary tree.
+*/
+
+const buildTree = (preorder, inorder) => {
+    if (inorder.length > 0) {
+    	// we need to change or update the postorder list, that's why shift()
+        const rootVal = preorder.shift();
+        const rootIndex = inorder.indexOf(rootVal);
+        const rootNode = new TreeNode(rootVal);
+
+        const left = inorder.slice(0, rootIndex);
+        const right = inorder.slice(rootIndex + 1);
+
+        // Construct left subtree first due to the nature of preorder traversal
+        rootNode.left = buildTree(preorder, left);
+        rootNode.right = buildTree(preorder, right);
+
+        return rootNode;
+    }
+    return null;
+};
+
+
+/*
+	Given two integer arrays inorder and postorder where inorder is the inorder traversal of a binary tree and postorder is the postorder traversal of the same tree, construct and return the binary tree.
+	inorder = [9,3,15,20,7], postorder = [9,15,7,20,3]
+
+*/
+
+const buildTree = (inorder, postorder) => {
+
+    if (inorder.length > 0) {
+        // we need to change or update the postorder list, that's why pop()
+        const rootVal = postorder.pop(); 
+        const rootIndex = inorder.indexOf(rootVal);
+        const rootNode = new TreeNode(rootVal);
+
+        const left = inorder.slice(0, rootIndex);
+        const right = inorder.slice(rootIndex + 1);
+
+        rootNode.right = buildTree(right, postorder);
+        rootNode.left = buildTree(left, postorder);
+
+        return rootNode;
+    }
+    return null;
+};
+
+
+/*
+Given the root of a binary tree, return the bottom-up level order traversal of its nodes' values. (i.e., from left to right, level by level from leaf to root).
+
+*/
+
+var levelOrderBottom = function(root) {
+    let res = [];
+    const traverse = (node, level) => {
+        if (!node) return;
+        if (res.length === level) {
+            res.push([]);
+        }
+        // PreOrder Traversal
+        res[level].push(node.val);
+        traverse(node.left, level + 1);
+        traverse(node.right, level + 1);
+    };
+    traverse(root, 0);
+    return res.reverse();
+}
+
+
+/*
+	Given an integer array nums where the elements are sorted in ascending order, convert it to a height-balanced binary search tree.
+*/
+
+function sortedArrayToBST(list){
+	
+	if(list.length === 0) return null;
+
+	let rootValue = Math.floor(list.length / 2);
+	root = new TreeNode(list[rootValue]);
+
+	let leftTree = list.slice(0, mid);
+	let rightTree = list.slice(mid+1);
+
+	root.left = sortedArrayToBST(leftTree);
+	root.right = sortedArrayToBST(rightTree);
+
+	return root;
+}
+sortedArrayToBST(list)
+
+/*
+Given the head of a singly linked list where elements are sorted in ascending order, convert it to a 
+height-balanced
+ binary search tree.
+*/
+
+var sortedListToBST = function(head) {
+    if (!head) return null;
+
+    function findSize(head) {
+        let node = head;
+        let size = 0;
+        while (node !== null) {
+            size++;
+            node = node.next;
+        }
+        return size;
+    }
+
+    function convertListToBST(start, end) {
+        if (start > end) return null;
+        
+        let mid = Math.floor((start + end) / 2);
+        let leftChild = convertListToBST(start, mid - 1);
+
+        let root = new TreeNode(head.val);
+        root.left = leftChild;
+
+        head = head.next;
+
+        root.right = convertListToBST(mid + 1, end);
+        return root;
+    }
+
+    let size = findSize(head);
+    return convertListToBST(0, size - 1);
+};
+
+
+
+/*
+Given a binary tree, determine if it is height-balanced.
+*/
+
+var isBalanced = function(node) {
+	let isBalanced = true
+	function helper(node){
+		if(!node) return 0
+		const left = helper(node.left)
+		const right = helper(node.right)
+		if(Math.abs(left - right) > 1) {
+            isBalanced = false
+        }
+		return 1 + Math.max(left, right) // calculates the height
+	}
+	helper(node)
+  return isBalanced;    
+};
+
+
+
+/*
+Given a binary tree, find its minimum depth.
+The minimum depth is the number of nodes along the shortest path from the root node down to the nearest leaf node.
+Note: A leaf is a node with no children.
+*/
+
+var minDepth = function(root) {
+    if (!root) return 0;
+    if (!root.left) return minDepth(root.right) + 1;
+    if (!root.right) return minDepth(root.left) + 1;
+
+    let leftTree = minDepth(root.left);
+    let rightTree = minDepth(root.right);
+
+    return Math.min( leftTree, rightTree ) + 1;
+};
+
+
+/*
+Given the root of a binary tree and an integer targetSum, return true if the tree has a root-to-leaf path such that adding up all the values along the path equals targetSum.
+A leaf is a node with no children.
+*/
+
+var hasPathSum = function (root, sum) {
+
+    if (!root) return false;
+    if (!root.left && !root.right) {
+        return sum === root.val;
+    }
+    else {
+        let leftTree = hasPathSum(root.left, sum - root.val);
+        let rightTree = hasPathSum(root.right, sum - root.val);
+
+        return leftTree || rightTree;
+    }
+};
+
+
+
+
+
+
+
+
+
+
+
+
+
+
